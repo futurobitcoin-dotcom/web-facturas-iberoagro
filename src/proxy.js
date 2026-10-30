@@ -19,10 +19,17 @@ export async function proxy(request) {
     }
   )
 
+  // Refrescamos la sesión
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+  // Si no hay usuario y quiere ir al panel principal, lo mandamos al login
+  if (!user && request.nextUrl.pathname === '/') {
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Si ya hay usuario y está en el login, lo mandamos al panel
+  if (user && request.nextUrl.pathname === '/login') {
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
   return response
