@@ -22,13 +22,12 @@ export async function proxy(request) {
   // Refrescamos la sesión
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Si no hay usuario y quiere ir al panel principal, lo mandamos al login
-  // --- DESACTIVADO TEMPORALMENTE PARA PRUEBA ---
-  // if (!user && request.nextUrl.pathname === '/') {
-  //   return NextResponse.redirect(new URL('/login', request.url))
-  // }
+  // 1. Si intenta entrar a una ruta protegida sin loguearse, va al login
+  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 
-  // Si ya hay usuario y está en el login, lo mandamos al panel
+  // 2. Si ya está logueado y entra a /login, va al panel
   if (user && request.nextUrl.pathname === '/login') {
     return NextResponse.redirect(new URL('/', request.url))
   }
