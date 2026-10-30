@@ -2,28 +2,26 @@
 
 import { useState } from 'react';
 import { supabase } from '../supabase';
-import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
       setError('Credenciales incorrectas. Verificá tu email y contraseña.');
-    } else {
-      router.push('/'); // Si el login es exitoso, va al panel principal
-      router.refresh();
+    } else if (data.session) {
+      // Usamos window.location para forzar la recarga completa y que el proxy lea la cookie
+      window.location.href = '/'; 
     }
   };
 
